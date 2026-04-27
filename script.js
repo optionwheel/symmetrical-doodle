@@ -424,9 +424,9 @@
     const current = normalizeAngle(startRotation);
     const landing = normalizeAngle(getLandingRotation(targetIndex));
     const delta = normalizeAngle(landing - current);
-    const fullTurns = 6 + Math.floor(Math.random() * 4);
+    const fullTurns = 10 + Math.floor(Math.random() * 5);
     const finalRotation = startRotation + fullTurns * TAU + delta;
-    const duration = 4600 + Math.random() * 1100;
+    const duration = 3000 + Math.random() * 800;
     const startedAt = performance.now();
 
     function animate(now) {
@@ -441,7 +441,7 @@
         return;
       }
 
-      state.rotation = normalizeAngle(finalRotation);
+      //state.rotation = normalizeAngle(finalRotation);
       state.spinFrame = null;
       finishSpin();
     }
@@ -819,8 +819,10 @@
       const elapsed = Math.min(34, now - previousTime);
       previousTime = now;
 
-      state.rotation = normalizeAngle(state.rotation + state.angularVelocity * elapsed);
-      state.angularVelocity *= Math.pow(friction, elapsed);
+      const dt = elapsed / 16.6667;
+
+      state.rotation += state.angularVelocity * dt;
+      state.angularVelocity *= Math.pow(friction, dt);
       drawWheel();
 
       if (Math.abs(state.angularVelocity) > minVelocity || now - startedAt < minRunTime) {
