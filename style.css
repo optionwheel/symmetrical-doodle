@@ -13,16 +13,13 @@
   --shadow-pink: rgba(255, 79, 237, 0.42);
   --shadow-blue: rgba(48, 215, 255, 0.32);
 }
-
 * {
   box-sizing: border-box;
 }
-
 html {
   min-height: 100%;
   background: var(--bg);
 }
-
 body {
   position: relative;
   isolation: isolate;
@@ -37,7 +34,6 @@ body {
     radial-gradient(circle at 84% 82%, rgba(255, 79, 237, 0.15), transparent 24rem),
     linear-gradient(180deg, #07020b 0%, #000 100%);
 }
-
 body::before {
   content: "";
   position: fixed;
@@ -57,7 +53,6 @@ body::before {
   opacity: 0.3;
   transform: rotate(-8deg) scale(1.18);
 }
-
 body::after {
   content: "";
   position: fixed;
@@ -68,21 +63,17 @@ body::after {
     radial-gradient(circle at 50% 20%, rgba(3, 1, 6, 0.36), rgba(3, 1, 6, 0.88) 62%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.78));
 }
-
 body.grass-glow {
   box-shadow: inset 0 0 150px rgba(57, 255, 111, 0.34);
 }
-
 button,
 textarea,
 select {
   font: inherit;
 }
-
 button {
   border: 0;
 }
-
 .app-shell {
   position: relative;
   min-height: 100vh;
@@ -93,7 +84,6 @@ button {
   padding: clamp(20px, 4vw, 54px);
   overflow: hidden;
 }
-
 .app-shell::before {
   content: "";
   position: fixed;
@@ -105,7 +95,6 @@ button {
   background-size: 42px 42px;
   mask-image: radial-gradient(circle, black 0%, transparent 72%);
 }
-
 .wheel-panel {
   position: relative;
   display: grid;
@@ -114,12 +103,10 @@ button {
   min-height: calc(100vh - 108px);
   gap: 22px;
 }
-
 .app-title {
   text-align: center;
   max-width: min(760px, 92vw);
 }
-
 .app-title p,
 .section-heading p,
 .dialog-kicker {
@@ -130,7 +117,6 @@ button {
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
-
 .app-title h1,
 .section-heading h2,
 .title-button {
@@ -141,24 +127,9 @@ button {
     0 0 22px var(--shadow-pink),
     0 0 42px rgba(155, 92, 255, 0.38);
 }
-
 .app-title h1 {
   font-size: clamp(34px, 4.2vw, 64px);
 }
-
-.app-title span {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 7px 13px;
-  border: 1px solid rgba(48, 215, 255, 0.32);
-  border-radius: 999px;
-  color: #eaf8ff;
-  background: rgba(48, 215, 255, 0.08);
-  font-size: 14px;
-  font-weight: 800;
-  box-shadow: 0 0 18px rgba(48, 215, 255, 0.12);
-}
-
 .wheel-stage {
   position: relative;
   width: min(68vh, 58vw, 690px);
@@ -167,11 +138,9 @@ button {
   display: grid;
   place-items: center;
 }
-
 body.wheel-active .wheel-stage {
   animation: wheel-wobble 420ms ease-in-out infinite;
 }
-
 #wheelCanvas {
   position: relative;
   width: 100%;
@@ -181,22 +150,14 @@ body.wheel-active .wheel-stage {
   touch-action: none;
   user-select: none;
   filter:
-    drop-shadow(0 0 20px rgba(155, 92, 255, 0.24))
-    drop-shadow(0 0 46px rgba(255, 79, 237, 0.22));
-}
-
-#wheelCanvas {
-  filter:
     drop-shadow(0 0 26px rgba(57, 255, 111, 0.16))
     drop-shadow(0 0 30px rgba(155, 92, 255, 0.32))
     drop-shadow(0 0 64px rgba(255, 79, 237, 0.26));
 }
-
 #wheelCanvas:active,
 body.wheel-dragging #wheelCanvas {
   cursor: grabbing;
 }
-
 .wheel-glow {
   position: absolute;
   inset: 8%;
@@ -204,12 +165,8 @@ body.wheel-dragging #wheelCanvas {
   background: radial-gradient(circle, rgba(255, 79, 237, 0.35), transparent 68%);
   filter: blur(28px);
   opacity: 0.7;
-}
-
-.wheel-glow {
   animation: glow-pulse 700ms ease-in-out infinite alternate;
 }
-
 .meme-sticker {
   position: absolute;
   z-index: 5;
@@ -228,25 +185,21 @@ body.wheel-dragging #wheelCanvas {
   text-align: center;
   transform: rotate(var(--tilt));
 }
-
 .sticker-one {
   --tilt: -8deg;
   top: 12%;
   left: -6%;
 }
-
 .sticker-two {
   --tilt: 7deg;
   top: 24%;
   right: -8%;
 }
-
 .sticker-three {
   --tilt: -4deg;
   right: 0;
   bottom: 12%;
 }
-
 .pointer {
   position: absolute;
   top: -16px;
@@ -259,7 +212,6 @@ body.wheel-dragging #wheelCanvas {
     drop-shadow(0 0 10px var(--shadow-blue))
     drop-shadow(0 0 24px var(--shadow-pink));
 }
-
 .pointer::before {
   content: "";
   position: absolute;
@@ -270,7 +222,6 @@ body.wheel-dragging #wheelCanvas {
   border-radius: 999px;
   background: linear-gradient(var(--blue), white);
 }
-
 .pointer::after {
   content: "";
   position: absolute;
@@ -283,7 +234,6 @@ body.wheel-dragging #wheelCanvas {
   border-right: 20px solid transparent;
   border-top: 36px solid #f8fbff;
 }
-
 .spin-button {
   position: relative;
   min-width: 178px;
@@ -308,7 +258,6 @@ body.wheel-dragging #wheelCanvas {
     filter 160ms ease,
     box-shadow 160ms ease;
 }
-
 .spin-button::before {
   content: "";
   position: absolute;
@@ -317,12 +266,10 @@ body.wheel-dragging #wheelCanvas {
   background: linear-gradient(135deg, rgba(48, 215, 255, 0.2), rgba(255, 79, 237, 0.28));
   z-index: 0;
 }
-
 .spin-button span {
   position: relative;
   z-index: 1;
 }
-
 .spin-button:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.02);
   filter: brightness(1.1);
@@ -330,20 +277,17 @@ body.wheel-dragging #wheelCanvas {
     0 0 30px var(--shadow-pink),
     0 0 54px var(--shadow-blue);
 }
-
 .spin-button:disabled {
   cursor: wait;
   opacity: 0.58;
   transform: scale(0.98);
 }
-
 .action-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
 }
-
 .status-message {
   min-height: 28px;
   margin: 0;
@@ -352,14 +296,12 @@ body.wheel-dragging #wheelCanvas {
   font-weight: 700;
   text-align: center;
 }
-
 .control-panel {
   position: relative;
   z-index: 5;
   display: grid;
   gap: 18px;
 }
-
 .panel-section {
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -372,7 +314,6 @@ body.wheel-dragging #wheelCanvas {
   padding: 18px;
   backdrop-filter: blur(18px);
 }
-
 .section-heading {
   display: flex;
   align-items: center;
@@ -380,12 +321,10 @@ body.wheel-dragging #wheelCanvas {
   gap: 16px;
   margin-bottom: 14px;
 }
-
 .section-heading h2,
 .title-button {
   font-size: 26px;
 }
-
 .title-button {
   padding: 0;
   border-radius: 8px;
@@ -395,13 +334,11 @@ body.wheel-dragging #wheelCanvas {
   text-align: left;
   transition: text-shadow 150ms ease;
 }
-
 .title-button:hover,
 .title-button:focus-visible {
   outline: none;
   text-shadow: 0 0 22px var(--shadow-pink);
 }
-
 .pill {
   min-width: 42px;
   padding: 7px 11px;
@@ -413,7 +350,6 @@ body.wheel-dragging #wheelCanvas {
   font-size: 14px;
   font-weight: 800;
 }
-
 #optionsInput {
   width: 100%;
   min-height: 236px;
@@ -427,14 +363,12 @@ body.wheel-dragging #wheelCanvas {
   box-shadow: inset 0 0 18px rgba(255, 79, 237, 0.08);
   line-height: 1.45;
 }
-
 #optionsInput:focus {
   border-color: var(--blue);
   box-shadow:
     0 0 0 3px rgba(48, 215, 255, 0.12),
     inset 0 0 18px rgba(255, 79, 237, 0.08);
 }
-
 .error-message {
   min-height: 22px;
   margin: 9px 0 0;
@@ -442,7 +376,6 @@ body.wheel-dragging #wheelCanvas {
   font-size: 14px;
   font-weight: 700;
 }
-
 .secondary-button,
 .ghost-button {
   min-height: 42px;
@@ -455,25 +388,20 @@ body.wheel-dragging #wheelCanvas {
     border-color 150ms ease,
     background 150ms ease;
 }
-
 .secondary-button {
   background: linear-gradient(135deg, rgba(48, 215, 255, 0.9), rgba(255, 79, 237, 0.84));
 }
-
 .ghost-button {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.06);
 }
-
 .secondary-button:hover,
 .ghost-button:hover {
   transform: translateY(-1px);
 }
-
 .reset-button {
   width: 100%;
 }
-
 .history-list {
   min-height: 144px;
   margin: 0;
@@ -484,7 +412,6 @@ body.wheel-dragging #wheelCanvas {
   gap: 9px;
   list-style: none;
 }
-
 .history-list li,
 .empty-history {
   display: flex;
@@ -496,17 +423,14 @@ body.wheel-dragging #wheelCanvas {
   background: rgba(255, 255, 255, 0.05);
   color: var(--muted);
 }
-
 .history-list strong {
   color: var(--text);
 }
-
 .history-note {
   color: var(--muted);
   font-size: 13px;
   font-weight: 700;
 }
-
 .result-dialog {
   position: fixed;
   inset: 0;
@@ -518,11 +442,9 @@ body.wheel-dragging #wheelCanvas {
   backdrop-filter: blur(8px);
   color: var(--text);
 }
-
 .result-dialog[hidden] {
   display: none;
 }
-
 .dialog-card {
   width: min(430px, 100%);
   border: 1px solid rgba(255, 79, 237, 0.56);
@@ -537,7 +459,6 @@ body.wheel-dragging #wheelCanvas {
     0 0 80px rgba(48, 215, 255, 0.18);
   animation: dialog-pop 420ms cubic-bezier(0.2, 1.35, 0.4, 1);
 }
-
 .dialog-card h2 {
   margin: 0 0 10px;
   font-size: clamp(34px, 7vw, 56px);
@@ -545,7 +466,6 @@ body.wheel-dragging #wheelCanvas {
   overflow-wrap: anywhere;
   text-shadow: 0 0 24px var(--shadow-pink);
 }
-
 .winner-comment {
   min-height: 28px;
   margin: 0 0 22px;
@@ -554,7 +474,6 @@ body.wheel-dragging #wheelCanvas {
   font-weight: 900;
   text-shadow: 0 0 18px rgba(48, 215, 255, 0.22);
 }
-
 .result-effect {
   min-height: 36px;
   margin: -8px 0 14px;
@@ -562,89 +481,73 @@ body.wheel-dragging #wheelCanvas {
   line-height: 1;
   filter: drop-shadow(0 0 16px rgba(255, 79, 237, 0.5));
 }
-
 .dialog-card.skill-shake {
   animation:
     dialog-pop 320ms cubic-bezier(0.2, 1.35, 0.4, 1),
     meme-shake 480ms 260ms ease-in-out;
 }
-
 .dialog-card.grass-card {
   border-color: rgba(57, 255, 111, 0.78);
   box-shadow:
     0 0 44px rgba(57, 255, 111, 0.34),
     0 0 80px rgba(48, 215, 255, 0.14);
 }
-
 .dialog-card.cooked-card {
   border-color: rgba(255, 149, 57, 0.84);
   box-shadow:
     0 0 48px rgba(255, 149, 57, 0.36),
     0 0 80px rgba(255, 79, 237, 0.16);
 }
-
 @keyframes dialog-pop {
   from {
     transform: translateY(10px) scale(0.96);
     opacity: 0;
   }
-
   to {
     transform: translateY(0) scale(1);
     opacity: 1;
   }
 }
-
 @keyframes meme-shake {
   0%,
   100% {
     transform: translateX(0) rotate(0deg);
   }
-
   20% {
     transform: translateX(-10px) rotate(-2deg);
   }
-
   40% {
     transform: translateX(9px) rotate(2deg);
   }
-
   60% {
     transform: translateX(-7px) rotate(-1deg);
   }
-
   80% {
     transform: translateX(6px) rotate(1deg);
   }
 }
-
 @keyframes wheel-wobble {
   0%,
   100% {
     transform: rotate(0deg) scale(1);
   }
-
   33% {
     transform: rotate(-0.8deg) scale(1.01);
   }
-
   66% {
     transform: rotate(0.8deg) scale(1.005);
   }
 }
-
 @keyframes glow-pulse {
   from {
     opacity: 0.55;
     transform: scale(0.96);
   }
-
   to {
     opacity: 1;
     transform: scale(1.04);
   }
 }
-
 .confetti-layer {
   position: fixed;
   inset: 0;
@@ -652,7 +555,6 @@ body.wheel-dragging #wheelCanvas {
   z-index: 20;
   overflow: hidden;
 }
-
 .confetti-piece {
   position: absolute;
   top: -16px;
@@ -661,14 +563,12 @@ body.wheel-dragging #wheelCanvas {
   border-radius: 3px;
   animation: confetti-fall 1100ms ease-out forwards;
 }
-
 @keyframes confetti-fall {
   to {
     transform: translate3d(var(--x), 105vh, 0) rotate(720deg);
     opacity: 0;
   }
 }
-
 .floating-meme-layer {
   position: fixed;
   inset: 0;
@@ -676,7 +576,6 @@ body.wheel-dragging #wheelCanvas {
   pointer-events: none;
   overflow: hidden;
 }
-
 .floating-meme {
   position: absolute;
   left: var(--left);
@@ -690,23 +589,19 @@ body.wheel-dragging #wheelCanvas {
     0 0 20px rgba(255, 79, 237, 0.5);
   animation: meme-float 1300ms ease-out forwards;
 }
-
 @keyframes meme-float {
   0% {
     transform: translate3d(0, 0, 0) scale(0.74) rotate(-8deg);
     opacity: 0;
   }
-
   15% {
     opacity: 1;
   }
-
   100% {
     transform: translate3d(var(--x), -130px, 0) scale(1.18) rotate(8deg);
     opacity: 0;
   }
 }
-
 .rig-panel {
   position: fixed;
   left: 16px;
@@ -721,21 +616,17 @@ body.wheel-dragging #wheelCanvas {
   box-shadow: 0 0 28px rgba(255, 79, 237, 0.2);
   z-index: 30;
 }
-
 body.rig-open .rig-panel {
   display: grid;
 }
-
 .rig-title {
   color: var(--pink);
   font-weight: 900;
 }
-
 .rig-panel label {
   color: var(--muted);
   font-size: 13px;
 }
-
 .rig-panel select,
 .rig-panel button {
   min-height: 34px;
@@ -744,11 +635,9 @@ body.rig-open .rig-panel {
   background: #050106;
   color: var(--text);
 }
-
 .rig-panel button {
   cursor: pointer;
 }
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -760,47 +649,38 @@ body.rig-open .rig-panel {
   white-space: nowrap;
   border: 0;
 }
-
 @media (max-width: 1020px) {
   body {
     overflow: auto;
   }
-
   .app-shell {
     grid-template-columns: 1fr;
     align-items: start;
     overflow: visible;
   }
-
   .wheel-panel {
     min-height: auto;
   }
-
   .wheel-stage {
     width: min(82vw, 620px);
   }
-
   .control-panel {
     width: min(680px, 100%);
     justify-self: center;
   }
 }
-
 @media (max-width: 560px) {
   .app-shell {
     padding: 18px 14px 28px;
   }
-
   .wheel-stage {
     width: min(92vw, 430px);
     min-width: 0;
   }
-
   .pointer {
     top: -10px;
     transform: translateX(-50%) scale(0.78);
   }
-
   .meme-sticker {
     display: none;
   }
