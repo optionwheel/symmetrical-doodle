@@ -455,17 +455,23 @@
 
   function finishSpin() {
     const winner = state.options[getWinnerIndexForRotation(state.rotation)];
+    const riggedIndex = getRiggedIndex();
 
     state.isSpinning = false;
     elements.spinButton.disabled = state.options.length < 2;
     elements.statusMessage.textContent = `Winner: ${winner}`;
     setWheelActive(false);
     updateSpinLabel();
-    playSound(winner === "skill issue" ? "bruh" : "win");
+
     addHistoryItem(winner);
     showResult(winner);
     drawWheel();
     saveState();
+
+    // ✅ reset rig after one use
+    if (riggedIndex >= 0) {
+      elements.rigTarget.value = "";
+    }
   }
 
   function addHistoryItem(winner) {
@@ -930,10 +936,16 @@
     elements.resetOptions.addEventListener("click", resetOptions);
     elements.optionsInput.addEventListener("input", () => updateOptions());
     elements.closeDialog.addEventListener("click", closeResultDialog);
-    elements.hideRig.addEventListener("click", () => {
+
+    elements.rigTarget.addEventListener("change", () => {
       document.body.classList.remove("rig-open");
       elements.optionsTitleButton.setAttribute("aria-expanded", "false");
     });
+
+  elements.hideRig.addEventListener("click", () => {
+    document.body.classList.remove("rig-open");
+    elements.optionsTitleButton.setAttribute("aria-expanded", "false");
+  });
     elements.canvas.addEventListener("pointerdown", beginWheelDrag);
     elements.canvas.addEventListener("pointermove", moveWheelDrag);
     elements.canvas.addEventListener("pointerup", endWheelDrag);
