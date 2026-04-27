@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>neonwheel.xyz</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="wheel-panel" aria-label="Glücksrad">
+        <div class="app-title">
+          <p>let faith decide for you</p>
+          <h1>neonwheel.xyz</h1>
+        </div>
+
+        <div class="wheel-stage">
+          <div class="pointer" aria-hidden="true"></div>
+          <span class="meme-sticker sticker-one">99% luck, 1% skill</span>
+          <span class="meme-sticker sticker-two">neonwheel aura.</span>
+          <span class="meme-sticker sticker-three">wassup king?</span>
+          <canvas id="wheelCanvas" width="900" height="900" aria-label="Drehbares Glücksrad"></canvas>
+          <div class="wheel-glow" aria-hidden="true"></div>
+        </div>
+
+        <div class="action-row">
+          <button id="spinButton" class="spin-button" type="button">
+            <span>spin 🗿</span>
+          </button>
+        </div>
+
+        <p id="statusMessage" class="status-message" aria-live="polite"></p>
+      </section>
+
+      <aside class="control-panel" aria-label="Glücksrad Optionen">
+        <div class="panel-section">
+          <div class="section-heading">
+            <div>
+              <p>segments</p>
+              <h2>options</h2>
+            </div>
+            <span id="optionCount" class="pill">8</span>
+          </div>
+
+          <label class="sr-only" for="optionsInput">options, one per row</label>
+          <textarea id="optionsInput" spellcheck="false" autocomplete="off">
+          </textarea>
+          <p id="optionsError" class="error-message" aria-live="assertive"></p>
+
+          <button id="resetOptions" class="ghost-button reset-button" type="button">delete all</button>
+        </div>
+
+        <div class="panel-section history-section">
+          <div class="section-heading">
+            <div>
+              <p>last spins</p>
+              <button id="optionsTitleButton" class="title-button" type="button" aria-expanded="false">history</button>
+            </div>
+          </div>
+          <ol id="historyList" class="history-list"></ol>
+        </div>
+      </aside>
+
+      <section id="resultDialog" class="result-dialog" role="dialog" aria-modal="true" aria-labelledby="winnerText" hidden>
+        <div class="dialog-card">
+          <p class="dialog-kicker">winner</p>
+          <h2 id="winnerText">option</h2>
+          <p id="winnerComment" class="winner-comment">the wheel has spoken.</p>
+          <div id="resultEffect" class="result-effect" aria-hidden="true"></div>
+          <button id="closeDialog" class="secondary-button" type="button">close</button>
+        </div>
+      </section>
+
+      <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
+      <div id="floatingMemeLayer" class="floating-meme-layer" aria-hidden="true"></div>
+
+      <form class="rig-panel" id="rigPanel" autocomplete="off">
+        <div class="rig-title">mod menu</div>
+        <label for="rigTarget">next winner</label>
+        <select id="rigTarget">
+          <option value="">random</option>
+        </select>
+        <button type="button" id="hideRig">hide</button>
+      </form>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
