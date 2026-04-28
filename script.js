@@ -8,7 +8,7 @@
   const palette = ["#e40303", "#004dff", "#008026", "#ffed00", "#ff8c00", "#750787", "#ff5bbd", "#5bcffa",];
   const spinLabels = ["spin it", "risk it", "turn it", "run it"];
   const spinMessages = ["john pork is calling ...", "running goon.exe ...", "hiding all nude photos ...", "waiting on response from block #67 ...", "calculating your forehead ...", "taking a big shit ...", "leaking your ip ...", "connecting to po*nhub.com ...", "reporting you to police ...", "confirming your bank details ...", "flirting with your ex ...",];
-  const clipPool = Array.from({ length: 37 }, (_, index) => "./media/" + (index + 1) + ".webm");
+  const clipPool = Array.from({ length: 38 }, (_, index) => "./media/" + (index + 1) + ".webm");
   const historyNotes = ["what the flip", "emotional damage", "recommended by nigg*rs", "we're so cooked", "how did this happen", "i guess bro", "who approved this", "witnessing greatness", "absolute peak", "villain won", "easy sidequest", "generational fumble", "w speed", "never back down, never what", "frame mogged by asu frat leader", "hawk tuah and spit on that thing", "rest in piece my granny", "you know what else is massive", "i mean it's alright", "ultimate chill guy", "+10000000 aura", "always 2 steps ahead", "i've played these games before", "standing on business", "lowkirkuinly well deserved", "bagged megan fox", "i'd rather double it", "always 2 steps behind",];
   const elements = {
     canvas: document.getElementById("wheelCanvas"),
@@ -90,6 +90,9 @@
     return items[Math.floor(Math.random() * items.length)];
   }
   function randomClipPath() {
+    if (clipPool.length === 0) {
+      return "./media/1.webm";
+    }
     return randomItem(clipPool);
   }
   function preloadClip(src) {
