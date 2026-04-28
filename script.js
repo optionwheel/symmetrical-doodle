@@ -1,79 +1,15 @@
 (() => {
-  const STORAGE_KEYS = {
-    options: "neonWheel.options",
-    history: "neonWheel.history",
-  };
-  const DEFAULT_OPTIONS = [
-    "Charlie Kirk",
-    "Epstein",
-    "Mark Zuckerberg",
-    "Donald Trump",
-    "Diddy",
-    "Netanyahu",
-    "Lebron James",
-    "Elon Musk",
-  ];
+  const STORAGE_KEYS = {options: "neonWheel.options", history: "neonWheel.history",};
+  const DEFAULT_OPTIONS = ["Charlie Kirk", "Epstein", "Mark Zuckerberg", "Donald Trump", "Diddy", "Netanyahu", "Lebron James", "Elon Musk",];
   const LEGACY_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8"];
   const MAX_HISTORY = 5;
   const TAU = Math.PI * 2;
   const POINTER_ANGLE = -Math.PI / 2;
-  const palette = [
-    "#e40303",
-    "#004dff",
-    "#008026",
-    "#ffed00",
-    "#ff8c00",
-    "#750787",
-    "#ff5bbd",
-    "#5bcffa",
-  ];
+  const palette = ["#e40303", "#004dff", "#008026", "#ffed00", "#ff8c00", "#750787", "#ff5bbd", "#5bcffa",];
   const spinLabels = ["spin it", "risk it", "turn it", "run it"];
-  const spinMessages = [
-    "running goon.exe ...",
-    "hiding all nude photos ...",
-    "waiting on response from block #67 ...",
-    "calculating your forehead ...",
-    "taking a shit ...",
-    "leaking your ip ...",
-    "connecting to po*nhub.com ...",
-    "reporting you to police ...",
-    "confirming your bank details ...",
-    "flirting with your ex ...",
-  ];
-  const memeComments = [
-    "w speed",
-    "never back down, never what",
-    "john pork is calling",
-    "frame mogged by asu frat leader",
-    "hawk tuah and spit on that thing",
-    "rest in piece my granny",
-    "you know what else is massive",
-    "i mean it's alright",
-    "ultimate chill guy",
-    "+10000000 aura",
-    "always 2 steps ahead",
-    "i've played these games before",
-    "standing on business",
-    "lowkirkuinly well deserved",
-    "you just bagged megan fox",
-    "i'd rather double it",
-    "always 2 steps behind",
-  ];
-  const emojis = "🔥 🚀 🏆";
-  const historyNotes = [
-    "what the flip",
-    "emotional damage",
-    "recommended by nigg*rs",
-    "we're so cooked",
-    "how did this happen",
-    "i guess bro",
-    "who approved this",
-    "witnessing greatness",
-    "absolute peak",
-    "villain won",
-    "easy sidequest",
-    "generational fumble",
-  ];
+  const spinMessages = ["john pork is calling ...", "running goon.exe ...", "hiding all nude photos ...", "waiting on response from block #67 ...", "calculating your forehead ...", "taking a big shit ...", "leaking your ip ...", "connecting to po*nhub.com ...", "reporting you to police ...", "confirming your bank details ...", "flirting with your ex ...",];
+  const gifPool = Array.from({ length: 37 }, (_, index) => "./gifs/" + (index + 1) + ".gif");
+  const historyNotes = ["what the flip", "emotional damage", "recommended by nigg*rs", "we're so cooked", "how did this happen", "i guess bro", "who approved this", "witnessing greatness", "absolute peak", "villain won", "easy sidequest", "generational fumble", "w speed", "never back down, never what", "frame mogged by asu frat leader", "hawk tuah and spit on that thing", "rest in piece my granny", "you know what else is massive", "i mean it's alright", "ultimate chill guy", "+10000000 aura", "always 2 steps ahead", "i've played these games before", "standing on business", "lowkirkuinly well deserved", "bagged megan fox", "i'd rather double it", "always 2 steps behind",];
   const elements = {
     canvas: document.getElementById("wheelCanvas"),
     spinButton: document.getElementById("spinButton"),
@@ -87,7 +23,6 @@
     historyList: document.getElementById("historyList"),
     resultDialog: document.getElementById("resultDialog"),
     winnerText: document.getElementById("winnerText"),
-    winnerComment: document.getElementById("winnerComment"),
     resultEffect: document.getElementById("resultEffect"),
     closeDialog: document.getElementById("closeDialog"),
     confettiLayer: document.getElementById("confettiLayer"),
@@ -150,9 +85,8 @@
   function randomItem(items) {
     return items[Math.floor(Math.random() * items.length)];
   }
-  function randomEmoji() {
-    const list = emojis.split(" ");
-    return list[Math.floor(Math.random() * list.length)];
+  function randomGifPath() {
+    return randomItem(gifPool);
   }
   function playSound(name) {
     if (name !== "spin") return;
@@ -488,18 +422,14 @@
     });
   }
   function showResult(winner) {
-    const comment = randomItem(memeComments);
     resetResultEffects();
     elements.winnerText.textContent = winner;
-    elements.winnerComment.textContent = comment;
     elements.resultDialog.hidden = false;
-    const emoji = randomEmoji();
-    elements.resultEffect.textContent = emoji + emoji + emoji;
+    elements.resultEffect.innerHTML = "<img class=\"result-gif\" src=\"" + escapeHtml(randomGifPath()) + "\" alt=\"winning gif\" loading=\"lazy\" decoding=\"async\">"
     fireConfetti();
   }
   function resetResultEffects() {
-    const emoji = randomEmoji();
-    elements.resultEffect.textContent = emoji + emoji + emoji;
+    elements.resultEffect.innerHTML = "<img class=\"result-gif\" src=\"" + escapeHtml(randomGifPath()) + "\" alt=\"winning gif\" loading=\"lazy\" decoding=\"async\">"
   }
   function fireConfetti() {
     elements.confettiLayer.innerHTML = "";
