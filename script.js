@@ -2,13 +2,13 @@
   const STORAGE_KEYS = {options: "neonWheel.options", history: "neonWheel.history",};
   const DEFAULT_OPTIONS = ["Charlie Kirk", "Epstein", "Mark Zuckerberg", "Donald Trump", "Diddy", "Netanyahu", "Lebron James", "Elon Musk",];
   const LEGACY_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8"];
-  const MAX_HISTORY = 5;
+  const INITIAL_HISTORY_VISIBLE = 5;
   const TAU = Math.PI * 2;
   const POINTER_ANGLE = -Math.PI / 2;
   const palette = ["#e40303", "#004dff", "#008026", "#ffed00", "#ff8c00", "#750787", "#ff5bbd", "#5bcffa",];
   const spinLabels = ["spin it", "risk it", "turn it", "run it"];
   const spinMessages = ["john pork is calling ...", "running goon.exe ...", "hiding all nude photos ...", "waiting on response from block #67 ...", "calculating your forehead ...", "taking a big shit ...", "leaking your ip ...", "connecting to po*nhub.com ...", "reporting you to police ...", "confirming your bank details ...", "flirting with your ex ...",];
-  const clipPool = Array.from({ length: 40 }, (_, index) => "./media/" + (index + 1) + ".webm");
+  const clipPool = Array.from({ length: 41 }, (_, index) => "./media/" + (index + 1) + ".webm");
   const historyNotes = ["what the flip", "emotional damage", "recommended by nigg*rs", "we're so cooked", "how did this happen", "i guess bro", "who approved this", "witnessing greatness", "absolute peak", "villain won", "easy sidequest", "generational fumble", "w speed", "never back down, never what", "frame mogged by asu frat leader", "hawk tuah and spit on that thing", "rest in piece my granny", "you know what else is massive", "i mean it's alright", "ultimate chill guy", "+10000000 aura", "always 2 steps ahead", "i've played these games before", "standing on business", "lowkirkuinly well deserved", "bagged megan fox", "i'd rather double it", "always 2 steps behind",];
   const elements = {
     canvas: document.getElementById("wheelCanvas"),
@@ -21,6 +21,9 @@
     optionsError: document.getElementById("optionsError"),
     statusMessage: document.getElementById("statusMessage"),
     historyList: document.getElementById("historyList"),
+    showMoreHistory: document.getElementById("showMoreHistory"),
+    clearHistory: document.getElementById("clearHistory"),
+    historyActions: document.getElementById("historyActions"),
     resultDialog: document.getElementById("resultDialog"),
     winnerText: document.getElementById("winnerText"),
     resultEffect: document.getElementById("resultEffect"),
@@ -49,6 +52,9 @@
     isSpinning: false,
     wheelDirty: true,
     overlayDirty: true,
+    isOptionsCleared: false,
+    visibleHistoryCount: INITIAL_HISTORY_VISIBLE,
+    isHistoryExpanded: false,
   };
   const sounds = {};
   const mediaCache = new Map();
@@ -63,7 +69,7 @@
       : DEFAULT_OPTIONS;
     elements.statusMessage.textContent = "";
     elements.optionsError.textContent = "";
-    state.history = Array.isArray(storedHistory) ? storedHistory.slice(0, MAX_HISTORY) : [];
+    state.history = Array.isArray(storedHistory) ? storedHistory : [];
     elements.optionsInput.value = optionsToUse.join("\n");
     elements.optionsInput.defaultValue = elements.optionsInput.value;
   }
@@ -85,6 +91,9 @@
   function saveState() {
     localStorage.setItem(STORAGE_KEYS.options, JSON.stringify(state.options));
     localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
+  }
+  function updateResetButtonLabel() {
+    elements.resetOptions.textContent = state.isOptionsCleared ? "restore all" : "delete all";
   }
   function randomItem(items) {
     return items[Math.floor(Math.random() * items.length)];
@@ -427,7 +436,7 @@
       minute: "2-digit",
     }).format(new Date());
     state.history.unshift({ winner, time, note: randomItem(historyNotes) });
-    state.history = state.history.slice(0, MAX_HISTORY);
+    state.visibleHistoryCount = Math.max(state.visibleHistoryCount, INITIAL_HISTORY_VISIBLE);
     renderHistory();
   }
   function renderHistory() {
@@ -437,9 +446,13 @@
       empty.className = "empty-history";
       empty.textContent = "no spins yet";
       elements.historyList.appendChild(empty);
+      elements.showMoreHistory.hidden = true;
+      elements.historyActions.hidden = true;
       return;
     }
-    state.history.forEach((entry) => {
+    const visibleCount = state.isHistoryExpanded ? state.history.length : state.visibleHistoryCount;
+    const visibleItems = state.history.slice(0, visibleCount);
+    visibleItems.forEach((entry) => {
       const item = document.createElement("li");
       const note = entry.note || randomItem(historyNotes);
       item.innerHTML = `
@@ -451,6 +464,21 @@
       `;
       elements.historyList.appendChild(item);
     });
+    if (state.history.length > state.visibleHistoryCount) {
+      elements.showMoreHistory.hidden = false;
+      elements.showMoreHistory.textContent = state.isHistoryExpanded ? "show less" : "show more";
+      elements.historyActions.hidden = !state.isHistoryExpanded;
+    } else {
+      elements.showMoreHistory.hidden = true;
+      elements.historyActions.hidden = true;
+    }
+  }
+  function clearFullHistory() {
+    state.history = [];
+    state.visibleHistoryCount = INITIAL_HISTORY_VISIBLE;
+    state.isHistoryExpanded = false;
+    saveState();
+    renderHistory();
   }
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (char) => {
@@ -494,14 +522,27 @@
     }, 1500);
   }
   function resetOptions() {
+    if (state.isOptionsCleared) {
+      elements.optionsInput.value = DEFAULT_OPTIONS.join("\n");
+      elements.optionsInput.defaultValue = elements.optionsInput.value;
+      state.rotation = 0;
+      state.isSpinning = false;
+      state.isOptionsCleared = false;
+      elements.confettiLayer.innerHTML = "";
+      document.body.classList.remove("wheel-active");
+      updateOptions();
+      updateResetButtonLabel();
+      elements.statusMessage.textContent = "options restored.";
+      return;
+    }
     cancelActiveAnimation();
     closeResultDialog();
     elements.optionsInput.value = "";
     elements.optionsInput.defaultValue = "";
     state.options = [];
-    state.history = [];
     state.rotation = 0;
     state.isSpinning = false;
+    state.isOptionsCleared = true;
     elements.confettiLayer.innerHTML = "";
     document.body.classList.remove("wheel-active");
     syncRigSelect("");
@@ -509,11 +550,11 @@
     drawWheel();
     renderHistory();
     localStorage.removeItem(STORAGE_KEYS.options);
-    localStorage.removeItem(STORAGE_KEYS.history);
     elements.optionCount.textContent = "0";
     elements.optionsError.textContent = "wheel needs at least 2 options to function.";
     elements.spinButton.disabled = true;
     elements.statusMessage.textContent = "no options left. the wheel is empty.";
+    updateResetButtonLabel();
   }
   function cancelActiveAnimation() {
     if (state.spinFrame) {
@@ -535,6 +576,11 @@
     elements.spinButton.addEventListener("click", spinWheel);
     elements.optionsTitleButton.addEventListener("click", toggleRigPanel);
     elements.resetOptions.addEventListener("click", resetOptions);
+    elements.showMoreHistory.addEventListener("click", () => {
+      state.isHistoryExpanded = !state.isHistoryExpanded;
+      renderHistory();
+    });
+    elements.clearHistory.addEventListener("click", clearFullHistory);
     elements.optionsInput.addEventListener("input", () => updateOptions());
     elements.closeDialog.addEventListener("click", closeResultDialog);
     elements.rigTarget.addEventListener("change", () => {
@@ -576,6 +622,7 @@
       }
     }, 2200);
     updateOptions({ persist: false });
+    updateResetButtonLabel();
     renderHistory();
   }
   init();
