@@ -385,9 +385,17 @@ body.wheel-active .wheel-glow, body.wheel-dragging .wheel-glow {
 .result-effect {
   min-height: 36px;
   margin: -8px 0 14px;
-  font-size: 34px;
-  line-height: 1;
-  filter: drop-shadow(0 0 16px rgba(255,79,237,0.5))
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.result-gif {
+  width: 280px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.28);
+  filter: drop-shadow(0 0 16px rgba(255,79,237,0.5));
 }
 .dialog-card.skill-shake {
   animation: dialog-pop 320ms cubic-bezier(0.2,1.35,0.4,1), meme-shake 480ms 260ms ease-in-out
