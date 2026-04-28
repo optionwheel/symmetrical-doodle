@@ -8,9 +8,10 @@
   const palette = ["#e40303", "#004dff", "#008026", "#ffed00", "#ff8c00", "#750787", "#ff5bbd", "#5bcffa",];
   const spinLabels = ["spin it", "risk it", "turn it", "run it"];
   const spinMessages = ["john pork is calling ...", "running goon.exe ...", "hiding all nude photos ...", "waiting on response from block #67 ...", "calculating your forehead ...", "taking a big shit ...", "leaking your ip ...", "connecting to po*nhub.com ...", "reporting you to police ...", "confirming your bank details ...", "flirting with your ex ...",];
-  const clipPool = Array.from({ length: 41 }, (_, index) => "./media/" + (index + 1) + ".webm");
-  const historyNotes = ["what the flip", "emotional damage", "recommended by nigg*rs", "we're so cooked", "how did this happen", "i guess bro", "who approved this", "witnessing greatness", "absolute peak", "villain won", "easy sidequest", "generational fumble", "w speed", "never back down, never what", "frame mogged by asu frat leader", "hawk tuah and spit on that thing", "rest in piece my granny", "you know what else is massive", "i mean it's alright", "ultimate chill guy", "+10000000 aura", "always 2 steps ahead", "i've played these games before", "standing on business", "lowkirkuinly well deserved", "bagged megan fox", "i'd rather double it", "always 2 steps behind",];
+  const clipPool = Array.from({ length: 52 }, (_, index) => "./media/" + (index + 1) + ".webm");
+  const historyNotes = ["what the flip", "emotional damage", "we're so cooked", "how did this happen", "i guess bro", "who approved this", "witnessing greatness", "absolute peak", "villain won", "easy sidequest", "generational fumble", "w speed", "never back down, never what", "frame mogged by asu frat leader", "hawk tuah and spit on that thing", "rest in piece my granny", "you know what else is massive", "i mean it's alright", "ultimate chill guy", "+10000000 aura", "always 2 steps ahead", "i've played these games before", "standing on business", "lowkirkuinly well deserved", "bagged megan fox", "i'd rather double it", "always 2 steps behind",];
   const elements = {
+    infoButton: document.getElementById("infoButton"),
     canvas: document.getElementById("wheelCanvas"),
     spinButton: document.getElementById("spinButton"),
     spinButtonLabel: document.querySelector("#spinButton span"),
@@ -25,9 +26,12 @@
     clearHistory: document.getElementById("clearHistory"),
     historyActions: document.getElementById("historyActions"),
     resultDialog: document.getElementById("resultDialog"),
+    infoDialog: document.getElementById("infoDialog"),
     winnerText: document.getElementById("winnerText"),
     resultEffect: document.getElementById("resultEffect"),
     closeDialog: document.getElementById("closeDialog"),
+    closeInfoDialog: document.getElementById("closeInfoDialog"),
+    infoDeleteAll: document.getElementById("infoDeleteAll"),
     confettiLayer: document.getElementById("confettiLayer"),
     rigPanel: document.getElementById("rigPanel"),
     rigTarget: document.getElementById("rigTarget"),
@@ -190,7 +194,7 @@
     }
     const previousRigTarget = elements.rigTarget.value;
     state.options = nextOptions;
-    if (elements.statusMessage.textContent === "no options left. the wheel is empty.") {
+    if (elements.statusMessage.textContent === "the wheel has no aura rn ...") {
       elements.statusMessage.textContent = "";
     }
     syncRigSelect(previousRigTarget);
@@ -284,7 +288,7 @@
     ctx.font = "700 32px Arial, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("i need at least 2 options twin", 0, 0);
+    ctx.fillText("add at least 2 options twin", 0, 0);
     ctx.restore();
   }
   function drawSegment(targetCtx, startAngle, endAngle, radius, index) {
@@ -551,9 +555,9 @@
     renderHistory();
     localStorage.removeItem(STORAGE_KEYS.options);
     elements.optionCount.textContent = "0";
-    elements.optionsError.textContent = "wheel needs at least 2 options to function.";
+    elements.optionsError.textContent = "how tf do you expect me to work with nothing";
     elements.spinButton.disabled = true;
-    elements.statusMessage.textContent = "no options left. the wheel is empty.";
+    elements.statusMessage.textContent = "the wheel has no aura rn ...";
     updateResetButtonLabel();
   }
   function cancelActiveAnimation() {
@@ -573,6 +577,7 @@
     }
   }
   function bindEvents() {
+    elements.infoButton.addEventListener("click", openInfoDialog);
     elements.spinButton.addEventListener("click", spinWheel);
     elements.optionsTitleButton.addEventListener("click", toggleRigPanel);
     elements.resetOptions.addEventListener("click", resetOptions);
@@ -583,6 +588,11 @@
     elements.clearHistory.addEventListener("click", clearFullHistory);
     elements.optionsInput.addEventListener("input", () => updateOptions());
     elements.closeDialog.addEventListener("click", closeResultDialog);
+    elements.closeInfoDialog.addEventListener("click", closeInfoDialog);
+    elements.infoDeleteAll.addEventListener("click", () => {
+      resetOptions();
+      closeInfoDialog();
+    });
     elements.rigTarget.addEventListener("change", () => {
       document.body.classList.remove("rig-open");
       elements.optionsTitleButton.setAttribute("aria-expanded", "false");
@@ -596,16 +606,28 @@
         closeResultDialog();
       }
     });
+    elements.infoDialog.addEventListener("click", (event) => {
+      if (event.target === elements.infoDialog) {
+        closeInfoDialog();
+      }
+    });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         document.body.classList.remove("rig-open");
         elements.optionsTitleButton.setAttribute("aria-expanded", "false");
+        closeInfoDialog();
       }
     });
   }
   function closeResultDialog() {
     elements.resultDialog.hidden = true;
     resetResultEffects();
+  }
+  function openInfoDialog() {
+    elements.infoDialog.hidden = false;
+  }
+  function closeInfoDialog() {
+    elements.infoDialog.hidden = true;
   }
   function init() {
     preloadAllClips().finally(() => {

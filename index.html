@@ -9,6 +9,7 @@
   </head>
   <body>
     <main class="app-shell">
+      <button id="infoButton" class="info-button" type="button" aria-label="about this site">i</button>
       <section class="wheel-panel" aria-label="Glücksrad">
         <div class="app-title">
           <p>let faith decide for you</p>
@@ -71,12 +72,20 @@
           <button id="closeDialog" class="secondary-button" type="button">close</button>
         </div>
       </section>
+      <section id="infoDialog" class="result-dialog" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
+        <div class="dialog-card">
+          <p class="dialog-kicker">about</p>
+          <h2 id="infoTitle">what the website does</h2>
+          <p class="info-copy">when your brain is cooked and choices got you balding, this wheel carries your balls.<br />press <button id="infoDeleteAll" class="info-inline-button" type="button">delete all</button>, type your options, hit spin and let fate decide the final answer.<br />zero overthinking, max brainrot.</p>
+          <button id="closeInfoDialog" class="secondary-button" type="button">close</button>
+        </div>
+      </section>
 
       <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
       <div id="floatingMemeLayer" class="floating-meme-layer" aria-hidden="true"></div>
 
       <form class="rig-panel" id="rigPanel" autocomplete="off">
-        <div class="rig-title">mod menu</div>
+        <div class="rig-title">easter egg</div>
         <label for="rigTarget">next winner</label>
         <select id="rigTarget">
           <option value="">random</option>
