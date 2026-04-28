@@ -27,27 +27,52 @@
     "#ff5bbd",
     "#5bcffa",
   ];
-  const spinLabels = ["spin", "risk it", "decide", "run it"];
+  const spinLabels = ["spin it", "risk it", "turn it", "run it"];
   const spinMessages = [
     "running goon.exe ...",
     "hiding all nude photos ...",
-    "critical error with file #67676767 ...",
+    "waiting on response from block #67 ...",
+    "calculating your forehead ...",
+    "taking a shit ...",
+    "leaking your ip ...",
+    "connecting to po*nhub.com ...",
+    "reporting you to police ...",
+    "confirming your bank details ...",
+    "flirting with your ex ...",
   ];
   const memeComments = [
-    "never back down never what!?",
-    "thanks speed, i needed this.",
-    "chat, is this real?",
-    "you absolutely got frame mogged.",
-    "100% luck, 0% brain.",
+    "w speed",
+    "never back down, never what",
+    "john pork is calling",
+    "frame mogged by asu frat leader",
+    "hawk tuah and spit on that thing",
+    "rest in piece my granny",
+    "you know what else is massive",
+    "i mean it's alright",
+    "ultimate chill guy",
+    "+10000000 aura",
+    "always 2 steps ahead",
+    "i've played these games before",
+    "standing on business",
+    "lowkirkuinly well deserved",
+    "you just bagged megan fox",
+    "i'd rather double it",
+    "always 2 steps behind",
   ];
-  const floatingTexts = ["ni**er", "67", "fuhhhhh...", "hawk tuah", "rip", "good luck"];
+  const emojis = "🔥 🚀 🏆";
   const historyNotes = [
-    "what the actual hell",
+    "what the flip",
     "emotional damage",
-    "recommended by ni**ers",
-    "very cooked outcome",
+    "recommended by nigg*rs",
+    "we're so cooked",
     "how did this happen",
     "i guess bro",
+    "who approved this",
+    "witnessing greatness",
+    "absolute peak",
+    "villain won",
+    "easy sidequest",
+    "generational fumble",
   ];
   const elements = {
     canvas: document.getElementById("wheelCanvas"),
@@ -61,44 +86,36 @@
     statusMessage: document.getElementById("statusMessage"),
     historyList: document.getElementById("historyList"),
     resultDialog: document.getElementById("resultDialog"),
-    dialogCard: document.querySelector(".dialog-card"),
     winnerText: document.getElementById("winnerText"),
     winnerComment: document.getElementById("winnerComment"),
     resultEffect: document.getElementById("resultEffect"),
     closeDialog: document.getElementById("closeDialog"),
     confettiLayer: document.getElementById("confettiLayer"),
-    floatingMemeLayer: document.getElementById("floatingMemeLayer"),
     rigPanel: document.getElementById("rigPanel"),
     rigTarget: document.getElementById("rigTarget"),
     hideRig: document.getElementById("hideRig"),
   };
-  const ctx = elements.canvas.getContext("2d");
+  const RENDER_SIZE = 560;
+  elements.canvas.width = RENDER_SIZE;
+  elements.canvas.height = RENDER_SIZE;
+  const ctx = elements.canvas.getContext("2d", { desynchronized: true });
   const wheelLayer = document.createElement("canvas");
   wheelLayer.width = elements.canvas.width;
   wheelLayer.height = elements.canvas.height;
   const wheelCtx = wheelLayer.getContext("2d");
+  const staticLayer = document.createElement("canvas");
+  staticLayer.width = elements.canvas.width;
+  staticLayer.height = elements.canvas.height;
+  const staticCtx = staticLayer.getContext("2d");
   const state = {
     options: [],
     history: [],
     rotation: 0,
     isSpinning: false,
-    isDragging: false,
-    pointerId: null,
-    lastPointerAngle: 0,
-    lastPointerTime: 0,
-    angularVelocity: 0,
-    dragDistance: 0,
-    lastDragDirection: 1,
-    spinFrame: null,
-    dragFallbackTimer: null,
-    floatingTimer: null,
     wheelDirty: true,
+    overlayDirty: true,
   };
-  const sounds = {
-    spin: new Audio("spin.mp3"),
-    win: new Audio("win.mp3"),
-    bruh: new Audio("bruh.mp3"),
-  };
+  const sounds = {};
   function loadStoredData() {
     const storedOptions = readJson(STORAGE_KEYS.options, DEFAULT_OPTIONS);
     const storedHistory = readJson(STORAGE_KEYS.history, []);
@@ -133,9 +150,18 @@
   function randomItem(items) {
     return items[Math.floor(Math.random() * items.length)];
   }
+  function randomEmoji() {
+    const list = emojis.split(" ");
+    return list[Math.floor(Math.random() * list.length)];
+  }
   function playSound(name) {
-    const sound = sounds[name];
-    if (!sound) return;
+    if (name !== "spin") return;
+    let sound = sounds[name];
+    if (!sound) {
+      sound = new Audio("spin.mp3");
+      sound.preload = "none";
+      sounds[name] = sound;
+    }
     try {
       sound.currentTime = 0;
       const playPromise = sound.play();
@@ -163,7 +189,7 @@
     elements.optionsError.textContent = isValid
       ? ""
       : "please enter at least two options.";
-    elements.spinButton.disabled = !isValid || state.isSpinning || state.isDragging;
+    elements.spinButton.disabled = !isValid || state.isSpinning;
     elements.optionCount.textContent = String(nextOptions.length);
     if (!isValid) {
       state.options = nextOptions;
@@ -205,31 +231,28 @@
   function normalizeAngle(angle) {
     return ((angle % TAU) + TAU) % TAU;
   }
-  function shortestAngleDelta(current, previous) {
-    return Math.atan2(Math.sin(current - previous), Math.cos(current - previous));
-  }
   function drawWheel() {
     const canvas = elements.canvas;
     const size = canvas.width;
     const center = size / 2;
     const radius = center - 42;
     ctx.clearRect(0, 0, size, size);
-    drawOuterGlow(center, radius);
     if (state.options.length < 2) {
+      drawOuterGlow(ctx, center, radius);
       drawEmptyWheel(center, radius);
       return;
     }
-    if (state.wheelDirty) {
+    if (state.wheelDirty || state.overlayDirty) {
       rebuildWheelLayer(size, center, radius);
       state.wheelDirty = false;
+      state.overlayDirty = false;
     }
     ctx.save();
     ctx.translate(center, center);
     ctx.rotate(state.rotation);
     ctx.drawImage(wheelLayer, -center, -center);
     ctx.restore();
-    drawRings(center, radius);
-    drawHub(center);
+    ctx.drawImage(staticLayer, 0, 0);
   }
   function rebuildWheelLayer(size, center, radius) {
     wheelCtx.clearRect(0, 0, size, size);
@@ -243,16 +266,23 @@
       drawSegmentLabel(wheelCtx, option, startAngle + segmentAngle / 2, radius, segmentAngle);
     });
     wheelCtx.restore();
+    rebuildStaticLayer(size, center, radius);
   }
-  function drawOuterGlow(center, radius) {
-    const glow = ctx.createRadialGradient(center, center, radius * 0.25, center, center, radius * 1.08);
+  function rebuildStaticLayer(size, center, radius) {
+    staticCtx.clearRect(0, 0, size, size);
+    drawOuterGlow(staticCtx, center, radius);
+    drawRings(staticCtx, center, radius);
+    drawHub(staticCtx, center);
+  }
+  function drawOuterGlow(targetCtx, center, radius) {
+    const glow = targetCtx.createRadialGradient(center, center, radius * 0.25, center, center, radius * 1.08);
     glow.addColorStop(0, "rgba(255, 79, 237, 0.08)");
     glow.addColorStop(0.7, "rgba(155, 92, 255, 0.12)");
     glow.addColorStop(1, "rgba(48, 215, 255, 0)");
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(center, center, radius * 1.12, 0, TAU);
-    ctx.fill();
+    targetCtx.fillStyle = glow;
+    targetCtx.beginPath();
+    targetCtx.arc(center, center, radius * 1.12, 0, TAU);
+    targetCtx.fill();
   }
   function drawEmptyWheel(center, radius) {
     ctx.save();
@@ -297,45 +327,45 @@
     targetCtx.textAlign = "center";
     targetCtx.textBaseline = "middle";
     targetCtx.shadowColor = "rgba(0, 0, 0, 0.4)";
-    targetCtx.shadowBlur = 8;
+    targetCtx.shadowBlur = 0;
     targetCtx.fillText(label, 0, 0, radius * 0.44);
     targetCtx.restore();
   }
-  function drawRings(center, radius) {
-    ctx.save();
-    ctx.translate(center, center);
-    ctx.beginPath();
-    ctx.arc(0, 0, radius + 10, 0, TAU);
-    ctx.strokeStyle = "#1d102a";
-    ctx.lineWidth = 18;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius + 10, 0, TAU);
-    ctx.strokeStyle = "rgba(48, 215, 255, 0.72)";
-    ctx.lineWidth = 4;
-    ctx.shadowColor = "rgba(48, 215, 255, 0.75)";
-    ctx.shadowBlur = 18;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius - 4, 0, TAU);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.26)";
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 0;
-    ctx.stroke();
-    ctx.restore();
+  function drawRings(targetCtx, center, radius) {
+    targetCtx.save();
+    targetCtx.translate(center, center);
+    targetCtx.beginPath();
+    targetCtx.arc(0, 0, radius + 10, 0, TAU);
+    targetCtx.strokeStyle = "#1d102a";
+    targetCtx.lineWidth = 18;
+    targetCtx.stroke();
+    targetCtx.beginPath();
+    targetCtx.arc(0, 0, radius + 10, 0, TAU);
+    targetCtx.strokeStyle = "rgba(48, 215, 255, 0.72)";
+    targetCtx.lineWidth = 4;
+    targetCtx.shadowColor = "rgba(48, 215, 255, 0.75)";
+    targetCtx.shadowBlur = 18;
+    targetCtx.stroke();
+    targetCtx.beginPath();
+    targetCtx.arc(0, 0, radius - 4, 0, TAU);
+    targetCtx.strokeStyle = "rgba(255, 255, 255, 0.26)";
+    targetCtx.lineWidth = 3;
+    targetCtx.shadowBlur = 0;
+    targetCtx.stroke();
+    targetCtx.restore();
   }
-  function drawHub(center) {
-    const gradient = ctx.createRadialGradient(center, center, 2, center, center, 58);
+  function drawHub(targetCtx, center) {
+    const gradient = targetCtx.createRadialGradient(center, center, 2, center, center, 58);
     gradient.addColorStop(0, "#fff");
     gradient.addColorStop(0.32, "#ff4fed");
     gradient.addColorStop(1, "#481067");
-    ctx.beginPath();
-    ctx.arc(center, center, 56, 0, TAU);
-    ctx.fillStyle = gradient;
-    ctx.shadowColor = "rgba(255, 79, 237, 0.6)";
-    ctx.shadowBlur = 22;
-    ctx.fill();
-    ctx.shadowBlur = 0;
+    targetCtx.beginPath();
+    targetCtx.arc(center, center, 56, 0, TAU);
+    targetCtx.fillStyle = gradient;
+    targetCtx.shadowColor = "rgba(255, 79, 237, 0.6)";
+    targetCtx.shadowBlur = 22;
+    targetCtx.fill();
+    targetCtx.shadowBlur = 0;
   }
   function lightenColor(hex, amount) {
     const value = Number.parseInt(hex.slice(1), 16);
@@ -361,7 +391,7 @@
     return riggedIndex >= 0 ? riggedIndex : Math.floor(Math.random() * state.options.length);
   }
   function spinWheel() {
-    if (state.isSpinning || state.isDragging || !updateOptions()) {
+    if (state.isSpinning || !updateOptions()) {
       return;
     }
     closeResultDialog();
@@ -372,15 +402,14 @@
     updateSpinLabel();
     playSound("spin");
     setWheelActive(true);
-    startFloatingMemeBurst();
     const targetIndex = pickWinnerIndex();
     const startRotation = state.rotation;
     const current = normalizeAngle(startRotation);
     const landing = normalizeAngle(getLandingRotation(targetIndex));
     const delta = normalizeAngle(landing - current);
-    const fullTurns = 16 + Math.floor(Math.random() * 6);
+    const fullTurns = 14 + Math.floor(Math.random() * 7);
     const finalRotation = startRotation + fullTurns * TAU + delta;
-    const duration = 5600 + Math.random() * 1600;
+    const duration = 3200 + Math.random() * 1400;
     const startedAt = performance.now();
     function animate(now) {
       const progress = Math.min((now - startedAt) / duration, 1);
@@ -464,60 +493,17 @@
     elements.winnerText.textContent = winner;
     elements.winnerComment.textContent = comment;
     elements.resultDialog.hidden = false;
-    applyEasterEgg(winner);
+    const emoji = randomEmoji();
+    elements.resultEffect.textContent = emoji + emoji + emoji;
     fireConfetti();
-    spawnFloatingMeme(randomItem(floatingTexts), { center: true });
   }
   function resetResultEffects() {
-    elements.dialogCard.classList.remove("skill-shake", "grass-card", "cooked-card");
-    elements.resultEffect.textContent = "💀💀💀";
-    document.body.classList.remove("grass-glow");
-  }
-  function applyEasterEgg(winner) {
-    if (winner === "Skill issue") {
-      elements.dialogCard.classList.add("skill-shake");
-      elements.resultEffect.textContent = "💀💀💀";
-      return;
-    }
-    if (winner === "Touch grass") {
-      elements.dialogCard.classList.add("grass-card");
-      elements.resultEffect.textContent = "🔥🔥🔥";
-      document.body.classList.add("grass-glow");
-      window.setTimeout(() => document.body.classList.remove("grass-glow"), 1300);
-      return;
-    }
-    if (winner === "Bro cooked") {
-      elements.dialogCard.classList.add("cooked-card");
-      elements.resultEffect.textContent = "🔥🔥🔥";
-    }
-  }
-  function spawnFloatingMeme(text = randomItem(floatingTexts), options = {}) {
-    const label = document.createElement("span");
-    label.className = "floating-meme";
-    label.textContent = text;
-    label.style.setProperty("--left", options.center ? "50%" : `${8 + Math.random() * 84}%`);
-    label.style.setProperty("--top", options.center ? "42%" : `${18 + Math.random() * 58}%`);
-    label.style.setProperty("--x", `${(Math.random() - 0.5) * 260}px`);
-    elements.floatingMemeLayer.appendChild(label);
-    window.setTimeout(() => {
-      label.remove();
-    }, 1400);
-  }
-  function startFloatingMemeBurst() {
-    spawnFloatingMeme();
-    window.clearInterval(state.floatingTimer);
-    state.floatingTimer = window.setInterval(() => {
-      if (!state.isSpinning && !state.isDragging) {
-        window.clearInterval(state.floatingTimer);
-        state.floatingTimer = null;
-        return;
-      }
-      spawnFloatingMeme();
-    }, 720);
+    const emoji = randomEmoji();
+    elements.resultEffect.textContent = emoji + emoji + emoji;
   }
   function fireConfetti() {
     elements.confettiLayer.innerHTML = "";
-    for (let index = 0; index < 36; index += 1) {
+    for (let index = 0; index < 18; index += 1) {
       const piece = document.createElement("span");
       piece.className = "confetti-piece";
       piece.style.left = `${Math.random() * 100}%`;
@@ -539,14 +525,8 @@
     state.history = [];
     state.rotation = 0;
     state.isSpinning = false;
-    state.isDragging = false;
-    state.angularVelocity = 0;
-    state.dragDistance = 0;
-    window.clearInterval(state.floatingTimer);
-    state.floatingTimer = null;
-    elements.floatingMemeLayer.innerHTML = "";
     elements.confettiLayer.innerHTML = "";
-    document.body.classList.remove("wheel-dragging", "wheel-active");
+    document.body.classList.remove("wheel-active");
     syncRigSelect("");
     state.wheelDirty = true;
     drawWheel();
@@ -564,228 +544,8 @@
       state.spinFrame = null;
     }
   }
-  function getPointerAngle(event) {
-    const rect = elements.canvas.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    return Math.atan2(event.clientY - centerY, event.clientX - centerX);
-  }
-  function beginWheelDrag(event) {
-    if (event.button !== 0) {
-      return;
-    }
-    if (state.isSpinning || !updateOptions()) {
-      return;
-    }
-    closeResultDialog();
-    cancelActiveAnimation();
-    state.isDragging = true;
-    state.pointerId = event.pointerId;
-    state.lastPointerAngle = getPointerAngle(event);
-    state.lastPointerTime = performance.now();
-    state.angularVelocity = 0;
-    state.dragDistance = 0;
-    elements.spinButton.disabled = true;
-    elements.statusMessage.textContent = "manual chaos detected ...";
-    document.body.classList.add("wheel-dragging");
-    setWheelActive(true);
-    startFloatingMemeBurst();
-    if (typeof elements.canvas.setPointerCapture === "function") {
-      elements.canvas.setPointerCapture(event.pointerId);
-    }
-    window.clearTimeout(state.dragFallbackTimer);
-    state.dragFallbackTimer = window.setTimeout(() => {
-      if (state.isDragging && state.dragDistance < 0.05) {
-        cancelWheelDrag();
-      }
-    }, 2200);
-  }
-  function moveWheelDrag(event) {
-    if (!state.isDragging || event.pointerId !== state.pointerId) {
-      return;
-    }
-    const now = performance.now();
-    const currentAngle = getPointerAngle(event);
-    const delta = shortestAngleDelta(currentAngle, state.lastPointerAngle);
-    const elapsed = Math.max(16, now - state.lastPointerTime);
-    state.rotation = normalizeAngle(state.rotation + delta);
-    state.angularVelocity = clamp(delta / elapsed, -0.045, 0.045);
-    state.dragDistance += Math.abs(delta);
-    if (Math.abs(delta) > 0.001) {
-      state.lastDragDirection = Math.sign(delta);
-    }
-    state.lastPointerAngle = currentAngle;
-    state.lastPointerTime = now;
-    drawWheel();
-  }
-  function endWheelDrag(event) {
-    if (!state.isDragging || event.pointerId !== state.pointerId) {
-      return;
-    }
-    state.isDragging = false;
-    state.pointerId = null;
-    document.body.classList.remove("wheel-dragging");
-    window.clearTimeout(state.dragFallbackTimer);
-    if (
-      typeof elements.canvas.hasPointerCapture === "function" &&
-      elements.canvas.hasPointerCapture(event.pointerId)
-    ) {
-      elements.canvas.releasePointerCapture(event.pointerId);
-    }
-    const launchVelocity = state.angularVelocity;
-    if (state.dragDistance < 0.05) {
-      elements.spinButton.disabled = state.options.length < 2;
-      elements.statusMessage.textContent = "";
-      setWheelActive(false);
-      return;
-    }
-    const riggedIndex = getRiggedIndex();
-    if (Math.abs(launchVelocity) < 0.0008) {
-      if (riggedIndex >= 0) {
-        startRiggedCursorSpin(launchVelocity || state.lastDragDirection * 0.003, riggedIndex);
-        return;
-      }
-      settleCurrentPosition();
-      return;
-    }
-    startPhysicsSpin(launchVelocity);
-  }
-  function forceEndWheelDrag() {
-    if (!state.isDragging) {
-      return;
-    }
-    state.isDragging = false;
-    state.pointerId = null;
-    document.body.classList.remove("wheel-dragging");
-    window.clearTimeout(state.dragFallbackTimer);
-    if (state.dragDistance < 0.05) {
-      cancelWheelDrag();
-      return;
-    }
-    const riggedIndex = getRiggedIndex();
-    if (Math.abs(state.angularVelocity) < 0.0008) {
-      if (riggedIndex >= 0) {
-        startRiggedCursorSpin(state.angularVelocity || state.lastDragDirection * 0.003, riggedIndex);
-        return;
-      }
-      settleCurrentPosition();
-      return;
-    }
-    startPhysicsSpin(state.angularVelocity);
-  }
-  function cancelWheelDrag() {
-    state.isDragging = false;
-    state.pointerId = null;
-    state.angularVelocity = 0;
-    state.dragDistance = 0;
-    document.body.classList.remove("wheel-dragging");
-    window.clearTimeout(state.dragFallbackTimer);
-    setWheelActive(false);
-    elements.spinButton.disabled = state.options.length < 2;
-    elements.statusMessage.textContent = "";
-  }
-  function startPhysicsSpin(initialVelocity) {
-    cancelActiveAnimation();
-    const riggedIndex = getRiggedIndex();
-    if (riggedIndex >= 0) {
-      startRiggedCursorSpin(initialVelocity, riggedIndex);
-      return;
-    }
-    state.isSpinning = true;
-    state.angularVelocity = initialVelocity * 1.8;
-    elements.spinButton.disabled = true;
-    elements.statusMessage.textContent = "physics said: wheeeee.";
-    playSound("spin");
-    setWheelActive(true);
-    let previousTime = performance.now();
-    const friction = 0.9942;
-    const minVelocity = 0.00012;
-    const startedAt = previousTime;
-    const minRunTime = 1400;
-    function animate(now) {
-      const elapsed = Math.min(34, now - previousTime);
-      previousTime = now;
-      const dt = elapsed / 16.6667;
-      state.rotation += state.angularVelocity * dt;
-      state.angularVelocity *= Math.pow(friction, dt);
-      drawWheel();
-      if (Math.abs(state.angularVelocity) > minVelocity || now - startedAt < minRunTime) {
-        state.spinFrame = requestAnimationFrame(animate);
-        return;
-      }
-      state.spinFrame = null;
-      settleCurrentPosition();
-    }
-    state.spinFrame = requestAnimationFrame(animate);
-  }
   function getRiggedIndex() {
     return state.options.indexOf(elements.rigTarget.value);
-  }
-  function startRiggedCursorSpin(initialVelocity, targetIndex) {
-    cancelActiveAnimation();
-    state.isSpinning = true;
-    state.angularVelocity = 0;
-    elements.spinButton.disabled = true;
-    elements.statusMessage.textContent = "randomness has decided";
-    playSound("spin");
-    setWheelActive(true);
-    startFloatingMemeBurst();
-    const startRotation = state.rotation;
-    const current = normalizeAngle(startRotation);
-    const landing = normalizeAngle(getLandingRotation(targetIndex));
-    const direction = Math.sign(initialVelocity) || state.lastDragDirection || 1;
-    const extraTurns = 2 + Math.floor(Math.random() * 3);
-    const forwardDelta = normalizeAngle(landing - current);
-    const backwardDelta = normalizeAngle(current - landing);
-    const delta = direction > 0
-      ? extraTurns * TAU + forwardDelta
-      : -(extraTurns * TAU + backwardDelta);
-    const finalRotation = startRotation + delta;
-    const releaseSpeed = clamp(Math.abs(initialVelocity) * 1.65, 0.0045, 0.024);
-    const duration = clamp(Math.abs(delta) / releaseSpeed, 2800, 6200);
-    const startedAt = performance.now();
-    function animate(now) {
-      const progress = Math.min((now - startedAt) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3.4);
-      state.rotation = normalizeAngle(startRotation + delta * eased);
-      drawWheel();
-      if (progress < 1) {
-        state.spinFrame = requestAnimationFrame(animate);
-        return;
-      }
-      state.rotation = normalizeAngle(finalRotation);
-      state.spinFrame = null;
-      finishSpin();
-    }
-    state.spinFrame = requestAnimationFrame(animate);
-  }
-  function settleCurrentPosition() {
-    const riggedIndex = getRiggedIndex();
-    const targetIndex = riggedIndex >= 0 ? riggedIndex : getWinnerIndexForRotation(state.rotation);
-    const landing = getLandingRotation(targetIndex);
-    const delta = shortestAngleDelta(normalizeAngle(landing), normalizeAngle(state.rotation));
-    const startRotation = state.rotation;
-    const finalRotation = startRotation + delta;
-    const duration = riggedIndex >= 0 ? 900 : 420;
-    const startedAt = performance.now();
-    state.isSpinning = true;
-    elements.spinButton.disabled = true;
-    function animate(now) {
-      const progress = Math.min((now - startedAt) / duration, 1);
-      const eased = easeOutCubic(progress);
-      state.rotation = normalizeAngle(startRotation + (finalRotation - startRotation) * eased);
-      drawWheel();
-      if (progress < 1) {
-        state.spinFrame = requestAnimationFrame(animate);
-        return;
-      }
-      state.spinFrame = null;
-      finishSpin();
-    }
-    state.spinFrame = requestAnimationFrame(animate);
-  }
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
   }
   function toggleRigPanel() {
     const isOpen = document.body.classList.toggle("rig-open");
@@ -804,18 +564,10 @@
       document.body.classList.remove("rig-open");
       elements.optionsTitleButton.setAttribute("aria-expanded", "false");
     });
-  elements.hideRig.addEventListener("click", () => {
+    elements.hideRig.addEventListener("click", () => {
     document.body.classList.remove("rig-open");
     elements.optionsTitleButton.setAttribute("aria-expanded", "false");
   });
-    elements.canvas.addEventListener("pointerdown", beginWheelDrag);
-    elements.canvas.addEventListener("pointermove", moveWheelDrag);
-    elements.canvas.addEventListener("pointerup", endWheelDrag);
-    elements.canvas.addEventListener("pointercancel", endWheelDrag);
-    window.addEventListener("pointerup", endWheelDrag);
-    window.addEventListener("pointercancel", endWheelDrag);
-    window.addEventListener("mouseup", forceEndWheelDrag);
-    window.addEventListener("blur", cancelWheelDrag);
     elements.resultDialog.addEventListener("click", (event) => {
       if (event.target === elements.resultDialog) {
         closeResultDialog();
@@ -837,7 +589,7 @@
     bindEvents();
     updateSpinLabel();
     window.setInterval(() => {
-      if (!state.isSpinning && !state.isDragging) {
+      if (!state.isSpinning) {
         updateSpinLabel();
       }
     }, 2200);
