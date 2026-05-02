@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>decided.lol</title>
+    <link rel="icon" href="./images/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <button id="infoButton" class="info-button" type="button" aria-label="about this site">i</button>
+      <section class="wheel-panel" aria-label="Glücksrad">
+        <div class="app-title">
+          <p>let fate decide for you</p>
+          <h1>decided.lol</h1>
+        </div>
+
+        <div class="wheel-stage">
+          <div class="pointer" aria-hidden="true"></div>
+          <canvas id="wheelCanvas" width="900" height="900" aria-label="Drehbares Glücksrad"></canvas>
+          <div class="wheel-glow" aria-hidden="true"></div>
+        </div>
+
+        <div class="action-row">
+          <button id="spinButton" class="spin-button" type="button">
+            <span>spin it</span>
+          </button>
+        </div>
+
+        <p id="statusMessage" class="status-message" aria-live="polite"></p>
+      </section>
+
+      <aside class="control-panel" aria-label="Glücksrad Optionen">
+        <div class="panel-section">
+          <div class="section-heading">
+            <div>
+              <p class="title-button"><span id="optionsTitleButton"></span>segments</p>
+              <h2>options</h2>
+            </div>
+            <span id="optionCount" class="pill">8</span>
+          </div>
+
+          <label class="sr-only" for="optionsInput">options, one per row</label>
+          <textarea id="optionsInput" spellcheck="false" autocomplete="off">
+          </textarea>
+          <p id="optionsError" class="error-message" aria-live="assertive"></p>
+
+          <button id="resetOptions" class="ghost-button reset-button" type="button">delete all</button>
+        </div>
+
+        <div class="panel-section history-section">
+          <div class="section-heading">
+            <div>
+              <p>last spins</p>
+              <h2>history</h2>
+            </div>
+          </div>
+          <ol id="historyList" class="history-list"></ol>
+          <button id="showMoreHistory" class="ghost-button history-more-button" type="button" hidden>show more</button>
+          <div id="historyActions" class="history-actions" hidden>
+            <button id="clearHistory" class="ghost-button history-action-button" type="button">clear history</button>
+          </div>
+        </div>
+      </aside>
+
+      <section id="resultDialog" class="result-dialog" role="dialog" aria-modal="true" aria-labelledby="winnerText" hidden>
+        <div class="dialog-card">
+          <p class="dialog-kicker">winner</p>
+          <h2 id="winnerText">option</h2>
+          <div id="resultEffect" class="result-effect" aria-hidden="true"></div>
+          <button id="closeDialog" class="secondary-button" type="button">close</button>
+        </div>
+      </section>
+      <section id="infoDialog" class="result-dialog" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
+        <div class="dialog-card">
+          <p class="dialog-kicker">about</p>
+          <h2 id="infoTitle">what the website does</h2>
+          <p class="info-copy">when your brain is cooked and choices got you balding, this wheel carries your balls.<br />press <button id="infoDeleteAll" class="info-inline-button" type="button">delete all</button>, type your options, hit spin and let fate decide the final answer.<br />zero overthinking, max brainrot...</p>
+          <button id="closeInfoDialog" class="secondary-button" type="button">close</button>
+        </div>
+      </section>
+
+      <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
+      <div id="floatingMemeLayer" class="floating-meme-layer" aria-hidden="true"></div>
+
+      <form class="settings-panel" id="settingsPanel" hidden autocomplete="off">
+        <div class="settings-title">easter egg</div>
+        <label for="settingsTarget">next winner</label>
+        <select id="settingsTarget">
+          <option value="">random</option>
+        </select>
+        <button type="button" id="hideSettings">hide</button>
+      </form>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
