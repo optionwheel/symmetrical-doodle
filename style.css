@@ -536,7 +536,7 @@ body.wheel-active .wheel-glow, body.wheel-dragging .wheel-glow {
     opacity: 0
   }
 }
-.rig-panel {
+.settings-panel {
   position: fixed;
   left: 16px;
   bottom: 16px;
@@ -548,27 +548,27 @@ body.wheel-active .wheel-glow, body.wheel-dragging .wheel-glow {
   border-radius: 12px;
   background: rgba(12,3,18,0.96);
   box-shadow: 0 0 28px rgba(255,79,237,0.2);
-  z-index: 30
+  z-index: 30;
 }
-body.rig-open .rig-panel {
-  display: grid
+body.settings-open .settings-panel {
+  display: grid;
 }
-.rig-title {
+.settings-title {
   color: var(--pink);
-  font-weight: 900
+  font-weight: 900;
 }
-.rig-panel label {
+.settings-panel label {
   color: var(--muted);
-  font-size: 13px
+  font-size: 13px;
 }
-.rig-panel select, .rig-panel button {
+.settings-panel select, .settings-panel button {
   min-height: 34px;
   border: 1px solid rgba(255,79,237,0.58);
   border-radius: 8px;
   background: #050106;
   color: var(--text)
 }
-.rig-panel button {
+.settings-panel button {
   cursor: pointer
 }
 .sr-only {
