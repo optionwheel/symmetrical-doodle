@@ -302,7 +302,8 @@ body.wheel-active .wheel-glow, body.wheel-dragging .wheel-glow {
   color: var(--text);
   background: rgba(4,1,8,0.74);
   box-shadow: inset 0 0 18px rgba(255,79,237,0.08);
-  line-height: 1.45
+  line-height: 1.45;
+  user-select: text
 }
 #optionsInput:focus {
   border-color: var(--blue);
